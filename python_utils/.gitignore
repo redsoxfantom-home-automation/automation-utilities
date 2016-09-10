@@ -1,0 +1,8 @@
+# Ignore setup.py files
+
+build/
+dist/
+python_utils.egg-info/
+
+# ignore compiled python files
+*.pyc
