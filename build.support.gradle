@@ -1,0 +1,8 @@
+/*
+   Helper tasks for gradle builds
+*/
+
+// Copies external home_automation dependencies
+task copyDependencies(type: Copy) {
+
+}
