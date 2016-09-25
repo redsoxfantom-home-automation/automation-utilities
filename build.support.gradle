@@ -8,10 +8,10 @@
 task copyDependencies << {
    project.ext.dependencies.each { dependency ->
       project.copy {
-         from "${project.projectDir}/../"+dependency
-         into "${project.buildDir}/"+dependency
+         from "${project.projectDir}${File.separator}..${File.separator}"+dependency
+         into "${project.buildDir}${File.separator}"+dependency
       }
-      println "Copying ${project.projectDir}/../"+dependency
+      println "Copying ${project.projectDir}${File.separator}..${File.separator}"+dependency
    }
 }
 
@@ -22,4 +22,17 @@ task clean(type:Delete) {
    doFirst {
       println "Deleting ${project.buildDir}"
    }
+}
+
+// Empty build task. Child projects should override this
+task build {
+
+}
+
+// Executes a clean and build of the project
+task rebuild {
+   // This specifies a dependency tree of clean->build
+   dependsOn clean
+   dependsOn build
+   build.mustRunAfter clean
 }
