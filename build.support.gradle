@@ -19,7 +19,7 @@ task copyDependencies << {
 // (don't copy the build directory itself though)
 task copySources(type:Copy) {
    from "${project.projectDir}"
-   into "${project.buildDir}"
+   into "${project.buildDir}${File.separator}"
    exclude "${project.buildDir}${File.separator}*"
 }
 
@@ -30,6 +30,14 @@ task clean(type:Delete) {
    doFirst {
       println "Deleting ${project.buildDir}"
    }
+}
+
+// Task that builds a docker container using the project's
+// build directory as a context
+task createDockerContainer(type: Exec) {
+   workingDir "${project.buildDir}"
+   executable "docker"
+   args "build -t ${project.name} .".split()
 }
 
 // empty build task. Child projects should override this
