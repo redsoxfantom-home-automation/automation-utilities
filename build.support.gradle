@@ -1,8 +1,25 @@
 /*
-   Helper tasks for gradle builds
+   Helper tasks + classes for gradle builds
 */
 
-// Copies external home_automation dependencies
-task copyDependencies(type: Copy) {
+// Copies over a list of dependencies
+// Usage: Define a list called "ext.dependencies" in the main project build.gradle
+// who's contents are the projects to be copied over
+task copyDependencies << {
+   project.ext.dependencies.each { dependency ->
+      project.copy {
+         from "${project.projectDir}/../"+dependency
+         into "${project.buildDir}/"+dependency
+      }
+      println "Copying ${project.projectDir}/../"+dependency
+   }
+}
 
+// Deletes the output directory of the project
+task clean(type:Delete) {
+   delete "${project.buildDir}"
+   
+   doFirst {
+      println "Deleting ${project.buildDir}"
+   }
 }
