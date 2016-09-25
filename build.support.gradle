@@ -8,11 +8,19 @@
 task copyDependencies << {
    project.ext.dependencies.each { dependency ->
       project.copy {
-         from "${project.projectDir}${File.separator}..${File.separator}"+dependency
-         into "${project.buildDir}${File.separator}"+dependency
+         from "${project.projectDir}${File.separator}..${File.separator}${dependency}"
+         into "${project.buildDir}${File.separator}${dependency}"
       }
-      println "Copying ${project.projectDir}${File.separator}..${File.separator}"+dependency
+      println "Copying ${project.projectDir}${File.separator}..${File.separator}${dependency} into ${project.buildDir}${File.separator}${dependency}"
    }
+}
+
+// Copy the project's sources into the build directory
+// (don't copy the build directory itself though)
+task copySources(type:Copy) {
+   from "${project.projectDir}"
+   into "${project.buildDir}"
+   exclude "${project.buildDir}${File.separator}*"
 }
 
 // Deletes the output directory of the project
@@ -24,10 +32,8 @@ task clean(type:Delete) {
    }
 }
 
-// Empty build task. Child projects should override this
-task build {
-
-}
+// empty build task. Child projects should override this
+task build
 
 // Executes a clean and build of the project
 task rebuild {
