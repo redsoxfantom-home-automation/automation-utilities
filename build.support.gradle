@@ -20,7 +20,25 @@ task copyDependencies << {
 task copySources(type:Copy) {
    from "${project.projectDir}"
    into "${project.buildDir}${File.separator}"
-   exclude "${project.buildDir}${File.separator}*"
+   exclude "build"
+}
+
+// Parses any file in the output directory with *.template
+task parseTemplates() << {
+   def templateFiles = fileTree("${project.buildDir}") {
+      include "**/*.template"
+   }
+
+   templateFiles.files.each { file->
+      project.copy {
+         from file
+         into project.buildDir
+         rename {"${file}" - '.template'}
+         expand([
+            testVal: 'this-is-a-test'
+         ])
+      }
+   }
 }
 
 // Deletes the output directory of the project
