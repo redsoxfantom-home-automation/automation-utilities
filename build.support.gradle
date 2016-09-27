@@ -29,13 +29,21 @@ task parseTemplates() << {
       include "**/*.template"
    }
 
+   // Load replacement.properties from the local repo
+   File replacements = new File("..${File.separator}automation-utilities${File.separator}replacement.properties")
+   Properties props = new Properties()
+   replacements.withInputStream {
+      props.load(it)
+   }
+   
+   //  Apply the replacement properties to the template files
    templateFiles.files.each { file->
       project.copy {
          from file
          into project.buildDir
          rename {"${file}" - '.template'}
          expand([
-            testVal: 'this-is-a-test'
+            props
          ])
       }
    }
