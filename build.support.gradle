@@ -83,6 +83,13 @@ task clean(type:Delete) {
    }
 }
 
+// Task that executes a Docker container in the daemon
+task runDockerContainer(type: Exec) {
+   workingDir "${project.buildDir}"
+   executable "docker"
+   args "run -d --net=host ${project.name}".split()
+}
+
 // Task that builds a docker container using the project's
 // build directory as a context
 task createDockerContainer(type: Exec) {
@@ -93,6 +100,9 @@ task createDockerContainer(type: Exec) {
 
 // empty build task. Child projects should override this
 task build
+
+// empty run task. Child projects should override this
+task run
 
 // Executes a clean and build of the project
 task rebuild {
