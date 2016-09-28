@@ -106,6 +106,9 @@ task build
 // empty run task. Child projects should override this
 task run
 
+// empty deploy task. Child projects should overried this
+task deploy
+
 // Executes a clean and build of the project
 task rebuild {
    // This specifies a dependency tree of clean->build
