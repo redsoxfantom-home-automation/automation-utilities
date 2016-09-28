@@ -51,7 +51,7 @@ task parseTemplates() << {
 
    // Load replacement.properties from the automation-utilities repo
    Properties props = new Properties()
-   File repoReplacements = new File("..${File.separator}automation-utilities${File.separator}replacement.properties")
+   File repoReplacements = new File("${projectDir}${File.separator}..${File.separator}automation-utilities${File.separator}replacement.properties")
    props = loadProperties(repoReplacements,props)
    // Load replacement.properties from the project repo and
    // replace any properties found in automation-utilities
@@ -61,6 +61,8 @@ task parseTemplates() << {
    def homeDir = System.getProperty("user.home")
    File homeReplacements = new File("${homeDir}${File.separator}.replacement.properties")
    props = loadProperties(homeReplacements,props)
+   
+   println "Using properties "+props
    //  Apply the replacement properties to the template files
    templateFiles.files.each { file->
       project.copy {
