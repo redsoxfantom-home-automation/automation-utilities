@@ -2,6 +2,18 @@
    Helper tasks + classes for gradle builds
 */
 
+// Checks to see if docker is available
+def isDockerAvailable() {
+   try {
+      Runtime rt = Runtime.getRuntime()
+      rt.exec('docker')
+      return true;
+   }
+   catch(Exception ex) {
+      return false;
+   }
+}
+
 // Helper method to load a properties file (if it exists) and overwrite the given properties object
 def loadProperties(propsFile,propertiesObj) {
    if(propsFile.exists()) {
@@ -94,7 +106,7 @@ task runDockerContainer(type: Exec) {
 
 // Task that builds a docker container using the project's
 // build directory as a context
-task createDockerContainer(type: Exec) {
+task deployDockerApplication(type: Exec) {
    workingDir "${project.buildDir}"
    executable "docker"
    args "build -t ${project.name} .".split()
@@ -106,8 +118,20 @@ task build
 // empty run task. Child projects should override this
 task run
 
-// empty deploy task. Child projects should overried this
-task deploy
+// empty deployment task. Deploys an application into
+// an environment that does not have docker installed.
+// Child projects should override this.
+task deployNativeApplication
+
+// deploy task. Child projects should override this
+task deploy {
+   if(isDockerAvailable()) {
+      dependsOn deployDockerApplication
+   }
+   else {
+      dependsOn deployNativeApplication
+   }
+}
 
 // Executes a clean and build of the project
 task rebuild {
