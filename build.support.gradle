@@ -98,10 +98,18 @@ task clean(type:Delete) {
 }
 
 // Task that executes a Docker container in the daemon
-task runDockerContainer(type: Exec) {
+task runDockerApplication(type: Exec) {
    workingDir "${project.buildDir}"
    executable "docker"
    args "run -d --net=host ${project.name}".split()
+}
+runDockerApplication << {
+	println "\'docker\' is available, running docker container"
+}
+
+// Runs a native application, child projects should override
+task runNativeApplication << {
+	println "\'docker\' is not available, running native application"
 }
 
 // Task that builds a docker container using the project's
@@ -115,17 +123,24 @@ deployDockerApplication << {
 	println "\'docker\' is available, creating docker container"
 }
 
-// empty build task. Child projects should override this
-task build
-
-// empty run task. Child projects should override this
-task run
-
 // empty deployment task. Deploys an application into
 // an environment that does not have docker installed.
 // Child projects should override this.
 task deployNativeApplication << {
 	  println "\'docker\' is not available, creating native application"
+}
+
+// empty build task. Child projects should override this
+task build
+
+// empty run task. Child projects should override this
+task run {
+	if(isDockerAvailable()) {
+		dependsOn runDockerApplication
+	}
+	else {
+		dependsOn runNativeApplication
+	}
 }
 
 // deploy task. Child projects should override this
