@@ -126,9 +126,11 @@ task deployNativeApplication
 // deploy task. Child projects should override this
 task deploy {
    if(isDockerAvailable()) {
+	  println "\'docker\' is available, creating docker container"
       dependsOn deployDockerApplication
    }
    else {
+	  println "\'docker\' is not available, creating native application"
       dependsOn deployNativeApplication
    }
 }
