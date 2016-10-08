@@ -111,6 +111,9 @@ task deployDockerApplication(type: Exec) {
    executable "docker"
    args "build -t ${project.name} .".split()
 }
+deployDockerApplication << {
+	println "\'docker\' is available, creating docker container"
+}
 
 // empty build task. Child projects should override this
 task build
@@ -121,16 +124,16 @@ task run
 // empty deployment task. Deploys an application into
 // an environment that does not have docker installed.
 // Child projects should override this.
-task deployNativeApplication
+task deployNativeApplication << {
+	  println "\'docker\' is not available, creating native application"
+}
 
 // deploy task. Child projects should override this
 task deploy {
    if(isDockerAvailable()) {
-	  println "\'docker\' is available, creating docker container"
       dependsOn deployDockerApplication
    }
    else {
-	  println "\'docker\' is not available, creating native application"
       dependsOn deployNativeApplication
    }
 }
