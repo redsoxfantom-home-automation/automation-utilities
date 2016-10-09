@@ -1,0 +1,64 @@
+//
+// helper methods and tasks associated with loading replacement properties
+//
+
+// Helper method to load a properties file (if it exists) and overwrite the given properties object
+ext.loadPropertiesFromFile = {propsFile,propertiesObj ->
+   if(propsFile.exists()) {
+      Properties newProperties = new Properties()
+      propsFile.withInputStream {
+         newProperties.load(it)
+      }
+      
+      // Loop through the loaded properties, overwriting any values already existing
+      newProperties.each{ prop ->
+         propertiesObj[prop.key] = newProperties[prop.key]
+      }
+   }
+   return propertiesObj
+}
+
+// Load all properties from the various replacement.properties files
+ext.loadProperties = {
+
+   // Load replacement.properties from the automation-utilities repo
+   Properties props = new Properties()
+   File repoReplacements = new File("${projectDir}${File.separator}..${File.separator}automation-utilities${File.separator}replacement.properties")
+   props = loadPropertiesFromFile(repoReplacements,props)
+   // Load replacement.properties from the project repo and
+   // replace any properties found in automation-utilities
+   File projectReplacements = new File("${project.projectDir}${File.separator}replacement.properties")
+   props = loadPropertiesFromFile(projectReplacements,props)
+   // Load replacement.properties from the user's home repo
+   def homeDir = System.getProperty("user.home")
+   File homeReplacements = new File("${homeDir}${File.separator}.replacement.properties")
+   props = loadPropertiesFromFile(homeReplacements,props)
+
+   return props
+}
+
+// Parses any file in the output directory with *.template
+// First looks in the automation-utilities repo for replacements,
+// then in the project's repo, then in the user's home directory
+// for a file called "replacement.properties"
+// If found, replaces values found in that file with values from the loaded file
+task parseTemplates() << {
+   def templateFiles = fileTree("${project.buildDir}") {
+      include "**/*.template"
+   }
+
+   Properties props = loadProperties()
+   
+   println "Using properties "+props
+   //  Apply the replacement properties to the template files
+   templateFiles.files.each { file->
+      project.copy {
+         from file
+         into project.buildDir
+         rename {"${file}" - '.template'}
+         expand([
+            props
+         ])
+      }
+   }
+}
