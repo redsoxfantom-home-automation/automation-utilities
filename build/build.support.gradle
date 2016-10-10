@@ -75,7 +75,7 @@ task clean(type:Delete) {
 task runDockerApplication(type: Exec) {
    workingDir "${project.buildDir}"
    executable "docker"
-   args "run -d --net=host ${project.name}".split()
+   args "run -d --cidfile="${project.buildDir}cid" --net=host ${project.name}".split()
 }
 runDockerApplication << {
 	println "\'docker\' is available, running docker container"
@@ -91,7 +91,7 @@ task runNativeApplication(dependsOn: 'verifyNativeExecutables') << {
 task deployDockerApplication(type: Exec) {
    workingDir "${project.buildDir}"
    executable "docker"
-   args "build -t ${project.name} .".split()
+   args "build --force-rm -t ${project.name} .".split()
 }
 deployDockerApplication << {
 	println "\'docker\' is available, creating docker container"
@@ -113,6 +113,20 @@ task terminateNativeApplication(dependsOn: 'verifyNativeExecutables') << {
 // Terminates an application running in a docker container
 task terminateDockerApplication << {
 	println "\'docker\' is available. Terminating docker application"
+
+   try {
+      String cid = new File("${project.buildDir}cid").text.trim()
+
+      exec {
+         executable "docker"
+         args "stop -t 2 ${cid}"
+      }
+      
+      sleep(2 * 1000)
+   }
+   catch (Exception ex) {
+      println "Container is not running"
+   }
 }
 
 // Verify all executables needed for native deployment are present
