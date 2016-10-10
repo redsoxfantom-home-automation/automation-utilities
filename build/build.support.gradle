@@ -4,16 +4,41 @@
 
 apply from: "${project.projectDir}${File.separator}..${File.separator}automation-utilities${File.separator}build${File.separator}build.properties.gradle"
 
-// Checks to see if docker is available
-def isDockerAvailable() {
-   try {
+// Define dependencies to copy over in the copyDependencies task
+ext.dependencies = []
+
+// list of executables that must be available to use the service if docker is not installed
+ext.requiredNativeExecutables = []
+
+// Checks if a particular executable is available
+def isExecutableAvailable(String exeName) {
+	try {
       Runtime rt = Runtime.getRuntime()
-      rt.exec('docker')
+      rt.exec(exeName)
       return true;
    }
    catch(Exception ex) {
       return false;
    }
+}
+
+// Checks if all native executables are available
+def checkAllExecutables(List<String> requiredExes) {
+	List<String> failedExecutables = new ArrayList<String>()
+	boolean foundAllExes = true
+	
+	requiredExes.each { exe ->
+		if(!isExecutableAvailable(exe)) {
+			failedExecutables.add(exe)
+			foundAllExes = false
+		}
+	}
+	
+	if(!foundAllExes){
+		println "The following executables are not present on this system: ${failedExecutables}"
+	}
+	
+	return foundAllExes
 }
 
 // Copies over a list of dependencies
@@ -58,6 +83,10 @@ runDockerApplication << {
 
 // Runs a native application, child projects should override
 task runNativeApplication << {
+	// Verify all executables needed for native running are present
+	if(!checkAllExecutables(project.ext.requiredNativeExecutables)) {
+		throw new GradleException("Required executables not present")
+	}
 	println "\'docker\' is not available, running native application"
 }
 
@@ -76,7 +105,11 @@ deployDockerApplication << {
 // an environment that does not have docker installed.
 // Child projects should override this.
 task deployNativeApplication << {
-	  println "\'docker\' is not available, creating native application"
+	// Verify all executables needed for native deployment are present
+	if(!checkAllExecutables(project.ext.requiredNativeExecutables)) {
+		throw new GradleException("Required executables not present")
+	}
+	println "\'docker\' is not available, creating native application"
 }
 
 // empty build task. Child projects should override this
@@ -84,7 +117,7 @@ task build
 
 // empty run task. Child projects should override this
 task run {
-	if(isDockerAvailable()) {
+	if(isExecutableAvailable('docker')) {
 		dependsOn runDockerApplication
 	}
 	else {
@@ -94,7 +127,7 @@ task run {
 
 // deploy task. Child projects should override this
 task deploy {
-   if(isDockerAvailable()) {
+   if(isExecutableAvailable('docker')) {
       dependsOn deployDockerApplication
    }
    else {
