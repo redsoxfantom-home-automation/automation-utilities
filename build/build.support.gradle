@@ -82,11 +82,7 @@ runDockerApplication << {
 }
 
 // Runs a native application, child projects should override
-task runNativeApplication << {
-	// Verify all executables needed for native running are present
-	if(!checkAllExecutables(project.ext.requiredNativeExecutables)) {
-		throw new GradleException("Required executables not present")
-	}
+task runNativeApplication(dependsOn: 'verifyNativeExecutables') << {
 	println "\'docker\' is not available, running native application"
 }
 
@@ -104,12 +100,26 @@ deployDockerApplication << {
 // empty deployment task. Deploys an application into
 // an environment that does not have docker installed.
 // Child projects should override this.
-task deployNativeApplication << {
-	// Verify all executables needed for native deployment are present
+task deployNativeApplication(dependsOn: 'verifyNativeExecutables') << {
+	println "\'docker\' is not available, creating native application"
+}
+
+// Empty termination task. Terminates an application not running in a 
+// docker container
+task terminateNativeApplication(dependsOn: 'verifyNativeExecutables') << {
+	println "\'docker\' is not available. Terminating native application"
+}
+
+// Terminates an application running in a docker container
+task terminateDockerApplication << {
+	println "\'docker\' is available. Terminating docker application"
+}
+
+// Verify all executables needed for native deployment are present
+task verifyNativeExecutables << {
 	if(!checkAllExecutables(project.ext.requiredNativeExecutables)) {
 		throw new GradleException("Required executables not present")
 	}
-	println "\'docker\' is not available, creating native application"
 }
 
 // empty build task. Child projects should override this
@@ -132,6 +142,17 @@ task deploy {
    }
    else {
       dependsOn deployNativeApplication
+   }
+}
+
+// Terminates a running application.
+// Child projects should override terminateNativeApplication
+task terminate {
+   if(isExecutableAvailable('docker')) {
+      dependsOn terminateDockerApplication
+   }
+   else {
+      dependsOn terminateNativeApplication
    }
 }
 
