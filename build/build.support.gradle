@@ -75,7 +75,7 @@ task clean(type:Delete) {
 task runDockerApplication(type: Exec) {
    workingDir "${project.buildDir}"
    executable "docker"
-   args "run -d --cidfile="${project.buildDir}cid" --net=host ${project.name}".split()
+   args "run -d --cidfile=${project.buildDir}${File.separator}cid --net=host ${project.name}".split()
 }
 runDockerApplication << {
 	println "\'docker\' is available, running docker container"
@@ -115,13 +115,15 @@ task terminateDockerApplication << {
 	println "\'docker\' is available. Terminating docker application"
 
    try {
-      String cid = new File("${project.buildDir}cid").text.trim()
+      String cid = new File("${project.buildDir}${File.separator}cid").text.trim()
 
       exec {
          executable "docker"
-         args "stop -t 2 ${cid}"
+         args "stop -t 2 ${cid}".split()
       }
       
+      delete "${project.buildDir}${File.separator}cid"
+
       sleep(2 * 1000)
    }
    catch (Exception ex) {
