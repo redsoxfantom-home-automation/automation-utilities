@@ -88,13 +88,26 @@ task runNativeApplication(dependsOn: 'verifyNativeExecutables') << {
 
 // Task that builds a docker container using the project's
 // build directory as a context
-task deployDockerApplication(type: Exec) {
-   workingDir "${project.buildDir}"
-   executable "docker"
-   args "build -t ${project.name} .".split()
-}
-deployDockerApplication << {
+task deployDockerApplication << {
 	println "\'docker\' is available, creating docker container"
+	
+	println "Deleting the previous docker image"
+	try {
+		exec {
+			executable "docker"
+			args "rmi -f ${project.name}".split()
+		}
+	}
+	catch (Exception ex) {
+		println "No previous image installed"
+	}
+	
+	// create a new docker image
+	exec {
+		workingDir "${project.buildDir}"
+		executable "docker"
+		args "build -t ${project.name} .".split()
+	}
 }
 
 // empty deployment task. Deploys an application into
