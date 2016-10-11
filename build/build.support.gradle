@@ -72,13 +72,15 @@ task clean(type:Delete) {
 }
 
 // Task that executes a Docker container in the daemon
-task runDockerApplication(type: Exec) {
-   workingDir "${project.buildDir}"
-   executable "docker"
-   args "run -d --cidfile=${home}${File.separator}.home_automation${File.separator}${project.name}${File.separator}cid --net=host ${project.name}".split()
-}
-runDockerApplication << {
+task runDockerApplication << {
 	println "\'docker\' is available, running docker container"
+   String home = System.getProperty("user.home")
+
+   exec {
+      workingDir "${project.buildDir}"
+      executable "docker"
+      args "run -d --cidfile=${home}${File.separator}.home_automation${File.separator}${project.name}${File.separator}cid --net=host ${project.name}".split()
+   }
 }
 
 // Runs a native application, child projects should override
