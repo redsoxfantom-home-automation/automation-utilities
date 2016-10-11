@@ -75,7 +75,7 @@ task clean(type:Delete) {
 task runDockerApplication(type: Exec) {
    workingDir "${project.buildDir}"
    executable "docker"
-   args "run -d --cidfile=${project.buildDir}${File.separator}cid --net=host ${project.name}".split()
+   args "run -d --cidfile=${home}${File.separator}.home_automation${File.separator}${project.name}${File.separator}cid --net=host ${project.name}".split()
 }
 runDockerApplication << {
 	println "\'docker\' is available, running docker container"
@@ -128,7 +128,8 @@ task terminateDockerApplication << {
 	println "\'docker\' is available. Terminating docker application"
 
    try {
-      String cid = new File("${project.buildDir}${File.separator}cid").text.trim()
+      String home = System.getProperty("user.home")
+      String cid = new File("${home}${File.separator}.home_automation${File.separator}${project.name}${File.separator}cid").text.trim()
 
       exec {
          executable "docker"
