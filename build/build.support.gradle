@@ -10,6 +10,15 @@ ext.dependencies = []
 // list of executables that must be available to use the service if docker is not installed
 ext.requiredNativeExecutables = []
 
+// Gets the persistant data directory (creates it if needed)
+ext.getProjectDirectory = { ->
+	String home = System.getProperty("user.home")
+	String persistantDirectory = "${home}${File.separator}.home_automation${File.separator}${project.name}${File.separator}"
+	mkdir(persistantDirectory)
+	
+	return persistantDirectory
+}
+
 // Checks if a particular executable is available
 def isExecutableAvailable(String exeName) {
 	try {
@@ -74,13 +83,13 @@ task clean(type:Delete) {
 // Task that executes a Docker container in the daemon
 task runDockerApplication << {
 	println "\'docker\' is available, running docker container"
-   String home = System.getProperty("user.home")
+	String home = getProjectDirectory()
 
-   exec {
-      workingDir "${project.buildDir}"
-      executable "docker"
-      args "run -d --cidfile=${home}${File.separator}.home_automation${File.separator}${project.name}${File.separator}cid --net=host ${project.name}".split()
-   }
+	exec {
+		workingDir "${project.buildDir}"
+		executable "docker"
+		args "run -d --cidfile=${home}${File.separator}cid --net=host ${project.name}".split()
+	}
 }
 
 // Runs a native application, child projects should override
@@ -130,15 +139,15 @@ task terminateDockerApplication << {
 	println "\'docker\' is available. Terminating docker application"
 
    try {
-      String home = System.getProperty("user.home")
-      String cid = new File("${home}${File.separator}.home_automation${File.separator}${project.name}${File.separator}cid").text.trim()
+      String home = getProjectDirectory()
+      String cid = new File("${home}${File.separator}cid").text.trim()
 
       exec {
          executable "docker"
          args "stop -t 2 ${cid}".split()
       }
       
-      delete "${project.buildDir}${File.separator}cid"
+      delete "${home}${File.separator}cid"
 
       sleep(2 * 1000)
    }
