@@ -40,13 +40,15 @@ task clean(type:Delete) {
 
 // Task that executes a Docker container in the daemon
 task runDockerApplication << {
-	println "\'docker\' is available, running docker container"
 	String home = getProjectDirectory()
+   Properties props = loadProperties()
+
+   println "\'docker\' is available, running docker container on tcp://${props.applicationHost}:2375"   
 
 	exec {
 		workingDir "${project.buildDir}"
 		executable "docker"
-		args "run -d --cidfile=${home}${File.separator}cid --net=host ${project.name}".split()
+		args "-H tcp://${props.applicationHost}:2375 run -d --cidfile=${home}${File.separator}cid --net=host ${project.name}".split()
 	}
 }
 
@@ -58,13 +60,14 @@ task runNativeApplication(dependsOn: 'verifyNativeExecutables') << {
 // Task that builds a docker container using the project's
 // build directory as a context
 task deployDockerApplication << {
-	println "\'docker\' is available, creating docker container"
-	
+	Properties prop = loadProperties()	
+   println "\'docker\' is available, creating docker container on tcp://${prop.applicationHost}:2375"   
+
 	println "Deleting the previous docker image"
 	try {
 		exec {
 			executable "docker"
-			args "rmi -f ${project.name}".split()
+			args "-H tcp://${prop.applicationHost}:2375 rmi -f ${project.name}".split()
 		}
 	}
 	catch (Exception ex) {
@@ -75,7 +78,7 @@ task deployDockerApplication << {
 	exec {
 		workingDir "${project.buildDir}"
 		executable "docker"
-		args "build --force-rm -t ${project.name} .".split()
+		args "-H tcp://${prop.applicationHost}:2375 build --force-rm -t ${project.name} .".split()
 	}
 }
 
@@ -94,15 +97,15 @@ task terminateNativeApplication(dependsOn: 'verifyNativeExecutables') << {
 
 // Terminates an application running in a docker container
 task terminateDockerApplication << {
-	println "\'docker\' is available. Terminating docker application"
-
    try {
       String home = getProjectDirectory()
       String cid = new File("${home}${File.separator}cid").text.trim()
+      Properties props = loadProperties()
+      println "\'docker\' is available. Terminating docker application on tcp://${props.applicationHost}:2375"
 
       exec {
          executable "docker"
-         args "stop -t 2 ${cid}".split()
+         args "-H tcp://${props.applicationHost}:2375 stop -t 2 ${cid}".split()
       }
       
       delete "${home}${File.separator}cid"
