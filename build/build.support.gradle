@@ -2,13 +2,11 @@
    Helper tasks + classes for gradle builds
 */
 
+apply from: "${project.projectDir}${File.separator}..${File.separator}automation-utilities${File.separator}build${File.separator}build.executables.gradle"
 apply from: "${project.projectDir}${File.separator}..${File.separator}automation-utilities${File.separator}build${File.separator}build.properties.gradle"
 
 // Define dependencies to copy over in the copyDependencies task
 ext.dependencies = []
-
-// list of executables that must be available to use the service if docker is not installed
-ext.requiredNativeExecutables = []
 
 // Gets the persistant data directory (creates it if needed)
 ext.getProjectDirectory = { ->
@@ -17,37 +15,6 @@ ext.getProjectDirectory = { ->
 	mkdir(persistantDirectory)
 	
 	return persistantDirectory
-}
-
-// Checks if a particular executable is available
-def isExecutableAvailable(String exeName) {
-	try {
-      Runtime rt = Runtime.getRuntime()
-      rt.exec(exeName)
-      return true;
-   }
-   catch(Exception ex) {
-      return false;
-   }
-}
-
-// Checks if all native executables are available
-def checkAllExecutables(List<String> requiredExes) {
-	List<String> failedExecutables = new ArrayList<String>()
-	boolean foundAllExes = true
-	
-	requiredExes.each { exe ->
-		if(!isExecutableAvailable(exe)) {
-			failedExecutables.add(exe)
-			foundAllExes = false
-		}
-	}
-	
-	if(!foundAllExes){
-		println "The following executables are not present on this system: ${failedExecutables}"
-	}
-	
-	return foundAllExes
 }
 
 // Copies over a list of dependencies
@@ -154,13 +121,6 @@ task terminateDockerApplication << {
    catch (Exception ex) {
       println "Container is not running"
    }
-}
-
-// Verify all executables needed for native deployment are present
-task verifyNativeExecutables << {
-	if(!checkAllExecutables(project.ext.requiredNativeExecutables)) {
-		throw new GradleException("Required executables not present")
-	}
 }
 
 // empty build task. Child projects should override this
