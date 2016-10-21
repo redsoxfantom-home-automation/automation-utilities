@@ -16,6 +16,7 @@ task copyDependencies << {
       project.copy {
          from "${project.projectDir}${File.separator}..${File.separator}${dependency}"
          into "${project.buildDir}${File.separator}${dependency}"
+		 exclude "**${File.separator}.gradle${File.separator}*"
       }
       println "Copying ${project.projectDir}${File.separator}..${File.separator}${dependency} into ${project.buildDir}${File.separator}${dependency}"
    }
@@ -26,7 +27,7 @@ task copyDependencies << {
 task copySources(type:Copy) {
    from "${project.projectDir}"
    into "${project.buildDir}${File.separator}"
-   exclude "build"
+   exclude "build",".gradle"
 }
 
 // Deletes the output directory of the project
@@ -157,4 +158,11 @@ task rebuild {
    dependsOn clean
    dependsOn build
    build.mustRunAfter clean
+}
+
+// Terminates and restarts the currently running application
+task restart {
+	dependsOn terminate
+	dependsOn run
+	run.mustRunAfter terminate
 }
