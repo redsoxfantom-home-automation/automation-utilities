@@ -8,15 +8,6 @@ apply from: "${project.projectDir}${File.separator}..${File.separator}automation
 // Define dependencies to copy over in the copyDependencies task
 ext.dependencies = []
 
-// Gets the persistant data directory (creates it if needed)
-ext.getProjectDirectory = { ->
-	String home = System.getProperty("user.home")
-	String persistantDirectory = "${home}${File.separator}.home_automation${File.separator}${project.name}${File.separator}"
-	mkdir(persistantDirectory)
-	
-	return persistantDirectory
-}
-
 // Copies over a list of dependencies
 // Usage: Define a list called "ext.dependencies" in the main project build.gradle
 // who's contents are the projects to be copied over
