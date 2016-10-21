@@ -1,0 +1,160 @@
+/*
+   Helper tasks + classes for gradle builds
+*/
+
+apply from: "${project.projectDir}${File.separator}..${File.separator}automation-utilities${File.separator}build${File.separator}build.executables.gradle"
+apply from: "${project.projectDir}${File.separator}..${File.separator}automation-utilities${File.separator}build${File.separator}build.properties.gradle"
+
+// Define dependencies to copy over in the copyDependencies task
+ext.dependencies = []
+
+// Copies over a list of dependencies
+// Usage: Define a list called "ext.dependencies" in the main project build.gradle
+// who's contents are the projects to be copied over
+task copyDependencies << {
+   project.ext.dependencies.each { dependency ->
+      project.copy {
+         from "${project.projectDir}${File.separator}..${File.separator}${dependency}"
+         into "${project.buildDir}${File.separator}${dependency}"
+      }
+      println "Copying ${project.projectDir}${File.separator}..${File.separator}${dependency} into ${project.buildDir}${File.separator}${dependency}"
+   }
+}
+
+// Copy the project's sources into the build directory
+// (don't copy the build directory itself though)
+task copySources(type:Copy) {
+   from "${project.projectDir}"
+   into "${project.buildDir}${File.separator}"
+   exclude "build"
+}
+
+// Deletes the output directory of the project
+task clean(type:Delete) {
+   delete "${project.buildDir}"
+   
+   doFirst {
+      println "Deleting ${project.buildDir}"
+   }
+}
+
+// Task that executes a Docker container in the daemon
+task runDockerApplication << {
+	String home = getProjectDirectory()
+   Properties props = loadProperties()
+
+   println "\'docker\' is available, running docker container on tcp://${props.applicationHost}:2375"   
+
+	exec {
+		workingDir "${project.buildDir}"
+		executable "docker"
+		args "-H tcp://${props.applicationHost}:2375 run -d --cidfile=${home}${File.separator}cid --net=host ${project.name}".split()
+	}
+}
+
+// Runs a native application, child projects should override
+task runNativeApplication(dependsOn: 'verifyNativeExecutables') << {
+	println "\'docker\' is not available, running native application"
+}
+
+// Task that builds a docker container using the project's
+// build directory as a context
+task deployDockerApplication << {
+	Properties prop = loadProperties()	
+   println "\'docker\' is available, creating docker container on tcp://${prop.applicationHost}:2375"   
+
+	println "Deleting the previous docker image"
+	try {
+		exec {
+			executable "docker"
+			args "-H tcp://${prop.applicationHost}:2375 rmi -f ${project.name}".split()
+		}
+	}
+	catch (Exception ex) {
+		println "No previous image installed"
+	}
+	
+	// create a new docker image
+	exec {
+		workingDir "${project.buildDir}"
+		executable "docker"
+		args "-H tcp://${prop.applicationHost}:2375 build --force-rm -t ${project.name} .".split()
+	}
+}
+
+// empty deployment task. Deploys an application into
+// an environment that does not have docker installed.
+// Child projects should override this.
+task deployNativeApplication(dependsOn: 'verifyNativeExecutables') << {
+	println "\'docker\' is not available, creating native application"
+}
+
+// Empty termination task. Terminates an application not running in a 
+// docker container
+task terminateNativeApplication(dependsOn: 'verifyNativeExecutables') << {
+	println "\'docker\' is not available. Terminating native application"
+}
+
+// Terminates an application running in a docker container
+task terminateDockerApplication << {
+   try {
+      String home = getProjectDirectory()
+      String cid = new File("${home}${File.separator}cid").text.trim()
+      Properties props = loadProperties()
+      println "\'docker\' is available. Terminating docker application on tcp://${props.applicationHost}:2375"
+
+      exec {
+         executable "docker"
+         args "-H tcp://${props.applicationHost}:2375 stop -t 2 ${cid}".split()
+      }
+      
+      delete "${home}${File.separator}cid"
+
+      sleep(2 * 1000)
+   }
+   catch (Exception ex) {
+      println "Container is not running"
+   }
+}
+
+// empty build task. Child projects should override this
+task build
+
+// empty run task. Child projects should override this
+task run {
+	if(isExecutableAvailable('docker')) {
+		dependsOn runDockerApplication
+	}
+	else {
+		dependsOn runNativeApplication
+	}
+}
+
+// deploy task. Child projects should override this
+task deploy {
+   if(isExecutableAvailable('docker')) {
+      dependsOn deployDockerApplication
+   }
+   else {
+      dependsOn deployNativeApplication
+   }
+}
+
+// Terminates a running application.
+// Child projects should override terminateNativeApplication
+task terminate {
+   if(isExecutableAvailable('docker')) {
+      dependsOn terminateDockerApplication
+   }
+   else {
+      dependsOn terminateNativeApplication
+   }
+}
+
+// Executes a clean and build of the project
+task rebuild {
+   // This specifies a dependency tree of clean->build
+   dependsOn clean
+   dependsOn build
+   build.mustRunAfter clean
+}

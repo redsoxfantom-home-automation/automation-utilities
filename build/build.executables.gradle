@@ -1,0 +1,45 @@
+/*
+   Helper tasks for checking executables
+*/
+
+// list of executables that must be available to use the service if docker is not installed
+ext.requiredNativeExecutables = []
+
+// Checks if a particular executable is available
+ext.isExecutableAvailable = { exeName ->
+	try {
+      Runtime rt = Runtime.getRuntime()
+      rt.exec(exeName)
+      return true;
+   }
+   catch(Exception ex) {
+      return false;
+   }
+}
+
+// Checks if all native executables are available
+def checkAllExecutables(List<String> requiredExes) {
+	List<String> failedExecutables = new ArrayList<String>()
+	boolean foundAllExes = true
+	
+	requiredExes.each { exe ->
+		if(!isExecutableAvailable(exe)) {
+			failedExecutables.add(exe)
+			foundAllExes = false
+		}
+	}
+	
+	if(!foundAllExes){
+		println "The following executables are not present on this system: ${failedExecutables}"
+      println "Ensure that they have been installed and are accessible via the PATH"
+	}
+	
+	return foundAllExes
+}
+
+// Verify all executables needed for native deployment are present
+task verifyNativeExecutables << {
+	if(!checkAllExecutables(project.ext.requiredNativeExecutables)) {
+		throw new GradleException("Required executables not present")
+	}
+}

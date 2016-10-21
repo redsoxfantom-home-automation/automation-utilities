@@ -1,0 +1,4 @@
+{
+	'zookeeper_host' : '${zookeeperHost}',
+	'zookeeper_port' : '${zookeeperPort}'
+}
