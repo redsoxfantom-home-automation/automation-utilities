@@ -1,0 +1,26 @@
+import org.gradle.internal.os.OperatingSystem;
+
+//
+// os-specific methods
+//
+
+def detectOs() {
+	println(OperatingSystem.current())
+}
+
+// Gets the "global" folder on the local machine.
+// That is, gets the common folder that all configuration should be stored in
+ext.getGlobalFolder = { ->
+	var os = detectOs();
+	
+	if(os.getFamilyName().equals("windows")) {
+		def env = System.getenv();
+		return env['ProgramData']; // usually C:\Program Data
+	}
+	
+	if(os.getFamilyName().equals("linux")) {
+		return "/usr/etc";
+	}
+	
+	throw new GradleException("The operating system "+os+" is not currently supported");
+}

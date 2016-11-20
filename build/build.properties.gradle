@@ -2,6 +2,8 @@
 // helper methods and tasks associated with loading replacement properties
 //
 
+apply from: "${project.projectDir}${File.separator}..${File.separator}automation-utilities${File.separator}build${File.separator}build.os.gradle"
+
 // Gets the persistant data directory (creates it if needed)
 ext.getProjectDirectory = { ->
 	String home = System.getProperty("user.home")
