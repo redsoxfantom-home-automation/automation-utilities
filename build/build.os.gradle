@@ -5,13 +5,13 @@ import org.gradle.internal.os.OperatingSystem;
 //
 
 def detectOs() {
-	println(OperatingSystem.current())
+	return OperatingSystem.current();
 }
 
 // Gets the "global" folder on the local machine.
 // That is, gets the common folder that all configuration should be stored in
 ext.getGlobalFolder = { ->
-	var os = detectOs();
+	OperatingSystem os = detectOs();
 	
 	if(os.getFamilyName().equals("windows")) {
 		def env = System.getenv();

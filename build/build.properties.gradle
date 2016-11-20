@@ -6,8 +6,8 @@ apply from: "${project.projectDir}${File.separator}..${File.separator}automation
 
 // Gets the persistant data directory (creates it if needed)
 ext.getProjectDirectory = { ->
-	String home = System.getProperty("user.home")
-	String persistantDirectory = "${home}${File.separator}.home_automation${File.separator}${project.name}${File.separator}"
+	String home = getGlobalFolder();
+	String persistantDirectory = "${home}${File.separator}home_automation${File.separator}${project.name}${File.separator}"
 	mkdir(persistantDirectory)
 	
 	return persistantDirectory
