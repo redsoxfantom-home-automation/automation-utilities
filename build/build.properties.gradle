@@ -44,11 +44,10 @@ ext.loadProperties = {
    File projectReplacements = new File("${project.projectDir}${File.separator}replacement.properties")
    props = loadPropertiesFromFile(projectReplacements,props)
    // Load replacement.properties from the user's home repo
-   def homeDir = System.getProperty("user.home")
-   File homeReplacements = new File("${homeDir}${File.separator}.home_automation${File.separator}replacement.properties")
+   def projDir = getProjectDirectory();
+   File homeReplacements = new File("${projDir}${File.separator}..${File.separator}replacement.properties")
    props = loadPropertiesFromFile(homeReplacements,props)
    // Load replacement.properties from the project-specific folder in the user's home repo
-   def projDir = getProjectDirectory()
    File projReplacements = new File("${projDir}replacement.properties")
    props = loadPropertiesFromFile(projReplacements,props)   
 
