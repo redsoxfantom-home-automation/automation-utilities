@@ -8,7 +8,11 @@ apply from: "${project.projectDir}${File.separator}..${File.separator}automation
 ext.getProjectDirectory = { ->
 	String home = getGlobalFolder();
 	String persistantDirectory = "${home}${File.separator}home_automation${File.separator}${project.name}${File.separator}"
-	mkdir(persistantDirectory)
+	
+	// Create if it doesn't exist (this may require admin)
+	if(!(new File(persistantDirectory).exists())) {
+		mkdir(persistantDirectory)
+	}
 	
 	return persistantDirectory
 }
