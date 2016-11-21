@@ -16,11 +16,17 @@ Template Variable Files
       $HOME/.home_automation/<application name>/replacement.properties
                   /\
       $HOME/.home_automation/replacement.properties
+				  /\
+      $GLOBAL/home_automation/<application name>/replacement.properties
+				  /\
+      $GLOBAL/home_automation/replacement.properties
                   /\
       <application repo>/replacement.properties
                   /\
       application-utilities/replacement.properties
-
+   
+   $GLOBAL is the location on the host machine where global configuration goes. On Windows machines, this is wherever %ProgramData% points (usually C:\Program Data). On Linux, this is "/usr/etc".
+   This folder will be created if it doesn't already exist (the creation may require local admin priviliges)
    Replacement files in $HOME can be used for defining host-specific properties. Replacement files in the repos define "useful defaults" and should not be modified.
    Ideally, you would put application specific properties in .home_automation/<application name>/replacement.properties, and "global" properties (like the zookeeper host and port) in .home_automation/replacement.properties
 Template Variable Values
