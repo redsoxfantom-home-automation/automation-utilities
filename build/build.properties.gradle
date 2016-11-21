@@ -45,30 +45,30 @@ ext.loadProperties = {
    // Load replacement.properties from the automation-utilities repo
    Properties props = new Properties()
    File repoReplacements = new File("${projectDir}${File.separator}..${File.separator}automation-utilities${File.separator}replacement.properties")
-   println("${repoReplacements}")
+   println("\t${repoReplacements}")
    props = loadPropertiesFromFile(repoReplacements,props)
    // Load replacement.properties from the project repo and
    // replace any properties found in automation-utilities
    File projectReplacements = new File("${project.projectDir}${File.separator}replacement.properties")
-   println("${projectReplacements}")
+   println("\t${projectReplacements}")
    props = loadPropertiesFromFile(projectReplacements,props)
    // Load replacement.properties from the global area
    def projDir = getProjectDirectory();
    File globalReplacements = new File("${projDir}${File.separator}..${File.separator}replacement.properties")
-   println("${globalReplacements}")
+   println("\t${globalReplacements}")
    props = loadPropertiesFromFile(globalReplacements,props)
    // Load replacement.properties from the project-specific folder in the global area
    File globalProjReplacements = new File("${projDir}replacement.properties")
-   println("${globalProjReplacements}")
+   println("\t${globalProjReplacements}")
    props = loadPropertiesFromFile(globalProjReplacements,props)   
    // Load replacement.properties from the user's home
-   var home = System.properties('user.home')
+   def home = System.getProperty("user.home")
    File homeReplacements = new File("${home}${File.separator}.home_automation${File.separator}replacement.properties")
-   println("${homeReplacements}")
+   println("\t${homeReplacements}")
    props = loadPropertiesFromFile(homeReplacements,props)
    // Load replacement.properties from the project specific file in the user's home repo
    File projHomeReplacements = new File("${home}${File.separator}.home_automation${File.separator}${project.projectDir}${File.separator}replacement.properties")
-   println("${projHomeReplacements}")
+   println("\t${projHomeReplacements}")
    props = loadPropertiesFromFile(projHomeReplacements,props)
 
    return props
