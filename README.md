@@ -36,3 +36,4 @@ Template Variable Values
       applicationPort - defines the port that this application will bind to.
       applicationHost - defines the host that will run this application (only applicable if you're using docker)
       dockerImage - defines the base docker image that this application will build off of (only applicable if you're using docker)
+
