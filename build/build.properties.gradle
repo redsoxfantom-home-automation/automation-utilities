@@ -67,7 +67,7 @@ ext.loadProperties = {
    println("\t${homeReplacements}")
    props = loadPropertiesFromFile(homeReplacements,props)
    // Load replacement.properties from the project specific file in the user's home repo
-   File projHomeReplacements = new File("${home}${File.separator}.home_automation${File.separator}${project.projectDir}${File.separator}replacement.properties")
+   File projHomeReplacements = new File("${home}${File.separator}.home_automation${File.separator}${project.name}${File.separator}replacement.properties")
    println("\t${projHomeReplacements}")
    props = loadPropertiesFromFile(projHomeReplacements,props)
 
