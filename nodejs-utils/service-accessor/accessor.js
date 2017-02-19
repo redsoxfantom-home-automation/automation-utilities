@@ -1,11 +1,8 @@
 var zookeeper = require('node-zookeeper-client');
-var process = require('process');
+var config = require('./config.json');
 var Q = require('q');
 
-var zk_host = process.env.ZK_HOST;
-var zk_port = process.env.ZK_PORT;
-
-var client = zookeeper.createClient(zk_host+':'+zk_port);
+var client = zookeeper.createClient(config.zk_host+':'+config.zk_port);
 var successfullyConnected = false;
 
 client.once('connected',function() {

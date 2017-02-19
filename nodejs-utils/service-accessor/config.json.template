@@ -1,0 +1,4 @@
+{
+   "zk_host" : "${zookeeperHost}",
+   "zk_port" : "${zookeeperPort}"
+}
