@@ -11,7 +11,7 @@ class ServiceAccessor(object):
       config_location = os.path.join(root_path,"config.json")
       config_data = json.load(open(config_location))
 
-      self.zkhost = config_data['zk_host']
+      self.zkhost = str(config_data['zk_host'])
       self.port = str(config_data['zk_port'])
       logging.info("Creating zookeeper client to connect to instance at %s:%s" % (self.zkhost,self.port))
       self.hostname = socket.gethostname()
