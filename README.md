@@ -16,9 +16,9 @@ Template Variable Files
       $HOME/.home_automation/<application name>/replacement.properties
                   /\
       $HOME/.home_automation/replacement.properties
-				  /\
+                  /\
       $GLOBAL/home_automation/<application name>/replacement.properties
-				  /\
+                  /\
       $GLOBAL/home_automation/replacement.properties
                   /\
       <application repo>/replacement.properties
@@ -37,4 +37,4 @@ Template Variable Values
       applicationHost - defines the host that will run this application (only applicable if you're using docker)
       dockerImage - defines the base docker image that this application will build off of (only applicable if you're using docker)
       logLevel - defines the minimum level the application logger logs at. Applications log to stdout. Acceptable levels (in order of severity) are: error, warning, info, debug
-
+      forcenative - if set to "true", will force a native compile and deploy, instead of a docker-based one. You should probably only use this in dev to speed up testing
