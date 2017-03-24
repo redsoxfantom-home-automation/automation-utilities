@@ -8,6 +8,9 @@ apply from: "${project.projectDir}${File.separator}..${File.separator}automation
 // Define dependencies to copy over in the copyDependencies task
 ext.dependencies = []
 
+// Load the properties from user.properties
+Properties props = loadProperties()
+
 // Copies over a list of dependencies
 // Usage: Define a list called "ext.dependencies" in the main project build.gradle
 // who's contents are the projects to be copied over
@@ -42,7 +45,6 @@ task clean(type:Delete) {
 // Task that executes a Docker container in the daemon
 task runDockerApplication << {
 	String home = getProjectDirectory()
-   Properties props = loadProperties()
 
    println "\'docker\' is available, running docker container on tcp://${props.applicationHost}:2375"   
 
@@ -61,7 +63,6 @@ task runNativeApplication(dependsOn: 'verifyNativeExecutables') << {
 // Task that builds a docker container using the project's
 // build directory as a context
 task deployDockerApplication << {
-	Properties prop = loadProperties()	
    println "\'docker\' is available, creating docker container on tcp://${prop.applicationHost}:2375"   
 
 	println "Deleting the previous docker image"
@@ -101,7 +102,6 @@ task terminateDockerApplication << {
    try {
       String home = getProjectDirectory()
       String cid = new File("${home}${File.separator}cid").text.trim()
-      Properties props = loadProperties()
       println "\'docker\' is available. Terminating docker application on tcp://${props.applicationHost}:2375"
 
       exec {
@@ -123,7 +123,10 @@ task build
 
 // empty run task. Child projects should override this
 task run {
-	if(isExecutableAvailable('docker')) {
+   if(props.forcenative) {
+      dependsOn runNativeApplication
+   }
+	else if(isExecutableAvailable('docker')) {
 		dependsOn runDockerApplication
 	}
 	else {
@@ -133,7 +136,10 @@ task run {
 
 // deploy task. Child projects should override this
 task deploy {
-   if(isExecutableAvailable('docker')) {
+   if(props.forcenative) {
+      dependsOn deployNativeApplication
+   }
+   else if(isExecutableAvailable('docker')) {
       dependsOn deployDockerApplication
    }
    else {
@@ -144,7 +150,10 @@ task deploy {
 // Terminates a running application.
 // Child projects should override terminateNativeApplication
 task terminate {
-   if(isExecutableAvailable('docker')) {
+   if(props.forcenative) {
+      dependsOn terminateNativeApplication
+   }
+   else if(isExecutableAvailable('docker')) {
       dependsOn terminateDockerApplication
    }
    else {

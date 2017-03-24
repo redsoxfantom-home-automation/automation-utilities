@@ -71,6 +71,7 @@ ext.loadProperties = {
    println("\t${projHomeReplacements}")
    props = loadPropertiesFromFile(projHomeReplacements,props)
 
+   println("Loaded Properties: ${props}")
    return props
 }
 
