@@ -63,13 +63,13 @@ task runNativeApplication(dependsOn: 'verifyNativeExecutables') << {
 // Task that builds a docker container using the project's
 // build directory as a context
 task deployDockerApplication << {
-   println "\'docker\' is available, creating docker container on tcp://${prop.applicationHost}:2375"   
+   println "\'docker\' is available, creating docker container on tcp://${props.applicationHost}:2375"   
 
 	println "Deleting the previous docker image"
 	try {
 		exec {
 			executable "docker"
-			args "-H tcp://${prop.applicationHost}:2375 rmi -f ${project.name}".split()
+			args "-H tcp://${props.applicationHost}:2375 rmi -f ${project.name}".split()
 		}
 	}
 	catch (Exception ex) {
@@ -80,7 +80,7 @@ task deployDockerApplication << {
 	exec {
 		workingDir "${project.buildDir}"
 		executable "docker"
-		args "-H tcp://${prop.applicationHost}:2375 build --force-rm -t ${project.name} .".split()
+		args "-H tcp://${props.applicationHost}:2375 build --force-rm -t ${project.name} .".split()
 	}
 }
 
@@ -123,7 +123,7 @@ task build
 
 // empty run task. Child projects should override this
 task run {
-   if(props.forcenative) {
+   if(props.forcenative == "true") {
       dependsOn runNativeApplication
    }
 	else if(isExecutableAvailable('docker')) {
@@ -136,7 +136,7 @@ task run {
 
 // deploy task. Child projects should override this
 task deploy {
-   if(props.forcenative) {
+   if(props.forcenative == "true") {
       dependsOn deployNativeApplication
    }
    else if(isExecutableAvailable('docker')) {
@@ -150,7 +150,7 @@ task deploy {
 // Terminates a running application.
 // Child projects should override terminateNativeApplication
 task terminate {
-   if(props.forcenative) {
+   if(props.forcenative == "true") {
       dependsOn terminateNativeApplication
    }
    else if(isExecutableAvailable('docker')) {
