@@ -1,0 +1,22 @@
+// Compile a mono application
+task buildMono << {
+   exec {
+      executable "nuget"
+      workingDir "${projectDir}${File.separator}${project.name}"
+      args=[
+         "install"
+      ]
+   }
+
+   exec {
+      executable "xbuild"
+      args=[
+         "/p:Configuration=Release"
+      ]
+   }
+
+   copy {
+      from "${projectDir}${File.separator}Dockerfile.template"
+      into "${buildDir}${File.separator}"
+   }
+}
