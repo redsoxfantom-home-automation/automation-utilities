@@ -80,7 +80,7 @@ ext.loadProperties = {
 // then in the project's repo, then in the user's home directory
 // for a file called "replacement.properties"
 // If found, replaces values found in that file with values from the loaded file
-task parseTemplates() << {
+task parseTemplates << {
    def templateFiles = fileTree("${project.buildDir}") {
       include "**/*.template"
    }
