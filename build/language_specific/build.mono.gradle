@@ -2,9 +2,9 @@
 task buildMono << {
    exec {
       executable "nuget"
-      workingDir "${projectDir}${File.separator}${project.name}"
+      workingDir "${projectDir}"
       args=[
-         "install"
+         "restore"
       ]
    }
 
@@ -13,10 +13,5 @@ task buildMono << {
       args=[
          "/p:Configuration=Release"
       ]
-   }
-
-   copy {
-      from "${projectDir}${File.separator}Dockerfile.template"
-      into "${buildDir}${File.separator}"
    }
 }

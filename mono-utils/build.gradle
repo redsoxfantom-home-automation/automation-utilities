@@ -1,0 +1,21 @@
+// import mono-specific build tasks
+apply from: "..${File.separator}build${File.separator}language_specific${File.separator}build.mono.gradle"
+
+task build {
+   dependsOn buildMono
+}
+
+task clean(type:Delete) {
+   delete "${project.buildDir}"
+
+   doFirst {
+      println "Deleting ${project.buildDir}"
+   }
+}
+
+task rebuild {
+   dependsOn clean
+   dependsOn build
+
+   build.mustRunAfter clean
+}
