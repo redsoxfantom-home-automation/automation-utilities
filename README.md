@@ -42,3 +42,34 @@ Applications can define their own specific variables, but the following are vari
 - dockerImage - defines the base docker image that this application will build off of (only applicable if you're using docker)
 - logLevel - defines the minimum level the application logger logs at. Applications log to stdout. Acceptable levels (in order of severity) are: error, warning, info, debug
 - forcenative - if set to "true", will force a native compile and deploy, instead of a docker-based one. You should probably only use this in dev to speed up testing
+
+### Building and Running
+All applications build and run using [Gradle](https://gradle.org/). They all come with a gradlew script that forces them to build using gradle 3.1. The following tasks are available:
+- build
+  - Compiles the application software
+- clean
+  - Deletes build outputs
+- rebuild
+  - Performs a "clean" followed by a "build"
+- deploy
+  - If using Docker, will create and deploy the docker image containing the application to the selected applicationHost
+  - If not using Docker, performs application-specific deployment steps.
+- run
+  - If using Docker, instructs the Docker instance on applicationHost to start running the image
+  - If not using Docker, starts the application on the local host as a daemon
+- terminate
+  - If using Docker, instructs the Docker instance on applicationHost to terminate the currently running image
+  - If not using Docker, performs a "kill -9" on the application daemon on the local host
+  - If the application is not running, is a no-op
+
+### Logs
+All applications log to stdout. If you are using Docker to run, application logs can be accessed via:
+
+      $ docker logs <container_id>
+      
+If you are not using Docker, application logs are available in "$GLOBAL/home_automation/\<application_name>/out" and "/err"
+
+#### Log Format
+All applications log with the following format:
+
+      LogLevel [application module] - message
