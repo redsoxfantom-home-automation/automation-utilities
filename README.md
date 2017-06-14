@@ -31,7 +31,7 @@ For example, if $REPO_LOCATION/application-utilities/replacement.properties defi
    
 $GLOBAL is the location on the host machine where global configuration goes. On Windows machines, this is wherever %ProgramData% points (usually C:\Program Data). On Linux, this is "/usr/etc". This folder will be created at build time if it doesn't already exist (the creation may require local admin priviliges). $REPO_LOCATION is the location that you cloned all the home_automation repos to. $HOME is the location of the current user's home directory.
    
-Replacement files in $HOME or $GLOBAL can be used for defining host-specific properties. Replacement files in the repos define "useful defaults" and should not be modified. Ideally, you would put application specific properties in .home_automation/<application name>/replacement.properties, and "global" properties (like the zookeeper host and port) in .home_automation/replacement.properties
+Replacement files in $HOME or $GLOBAL can be used for defining host-specific properties. Replacement files in the repos define "useful defaults" and should not be modified. Ideally, you would put application specific properties in .home_automation/\<application name>/replacement.properties, and "global" properties (like the zookeeper host and port) in .home_automation/replacement.properties
 
 #### Template Variable Values
 Applications can define their own specific variables, but the following are variables that all applications use:
