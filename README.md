@@ -35,13 +35,20 @@ Replacement files in $HOME or $GLOBAL can be used for defining host-specific pro
 
 #### Template Variable Values
 Applications can define their own specific variables, but the following are variables that all applications use:
-- zookeeperHost - defines the hostname of the machine running zookeeper. This should be common to all applications, since zookeeper is how they discover each other
-- zookeeperPort - defines the port number that the running instance of zookeeper is bound to.
-- applicationPort - defines the port that this application will bind to.
-- applicationHost - defines the host that will run this application (only applicable if you're using docker)
-- dockerImage - defines the base docker image that this application will build off of (only applicable if you're using docker)
-- logLevel - defines the minimum level the application logger logs at. Applications log to stdout. Acceptable levels (in order of severity) are: error, warning, info, debug
-- forcenative - if set to "true", will force a native compile and deploy, instead of a docker-based one. You should probably only use this in dev to speed up testing
+- zookeeperHost 
+  - Defines the hostname of the machine running zookeeper. This should be common to all applications, since zookeeper is how they discover each other
+- zookeeperPort 
+  - Defines the port number that the running instance of zookeeper is bound to.
+- applicationPort 
+  - Defines the port that this application will bind to.
+- applicationHost 
+  - Defines the host that will run this application (only applicable if you're using docker)
+- dockerImage 
+  - Defines the base docker image that this application will build off of (only applicable if you're using docker)
+- logLevel 
+  - Defines the minimum level the application logger logs at. Applications log to stdout. Acceptable levels (in order of severity) are: error, warning, info, debug
+- forcenative 
+  - If set to "true", will force a native compile and deploy, instead of a docker-based one. You should probably only use this in dev to speed up testing
 
 ### Building and Running
 All applications build and run using [Gradle](https://gradle.org/). They all come with a gradlew script that forces them to build using gradle 3.1. The following tasks are available:
