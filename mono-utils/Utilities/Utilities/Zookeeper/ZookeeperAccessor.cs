@@ -40,7 +40,7 @@ namespace Utilities.Zookeeper
 			CreateNode ("/services/"+apiLevel, new byte[0], CreateMode.Persistent);
 			CreateNode (rootPath, new byte[0], CreateMode.Persistent);
 			CreateNode (hostNamePath, Encoding.ASCII.GetBytes (host),CreateMode.Ephemeral);
-			CreateNode (portPath, BitConverter.GetBytes (port),CreateMode.Ephemeral);
+			CreateNode (portPath, Encoding.ASCII.GetBytes (port.ToString()),CreateMode.Ephemeral);
 		}
 
 		private void CreateNode(string path,byte[] data, CreateMode mode)
