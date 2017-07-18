@@ -95,6 +95,23 @@ task deployNativeApplication(dependsOn: 'verifyNativeExecutables') << {
 // docker container
 task terminateNativeApplication(dependsOn: 'verifyNativeExecutables') << {
 	println "\'docker\' is not available. Terminating native application"
+
+   try {
+		// Read the pid of the currently running process (started with daemonize)
+		String home = getProjectDirectory()
+		String currentPid = new File("${home}${File.separator}pid").text.trim();
+		
+		exec {
+			executable 'kill'
+			args=["-9","-"+currentPid]
+		}
+		
+		delete "${home}${File.separator}pid"
+	}
+	catch (Exception ex) {
+		println "Native application not currently running"
+	}
+
 }
 
 // Terminates an application running in a docker container
