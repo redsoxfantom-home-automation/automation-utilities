@@ -12,8 +12,9 @@ ext.getProjectDirectory = { ->
 	String persistantDirectory = "${home}${File.separator}home_automation${File.separator}${project.name}${File.separator}"
 	
 	// Create if it doesn't exist (this may require admin)
-	if(!(new File(persistantDirectory).exists())) {
-		mkdir(persistantDirectory)
+	File dir = new File(persistantDirectory)
+   if(!dir.exists()) {
+      mkdir(persistantDirectory)
 	}
 	
 	return persistantDirectory
